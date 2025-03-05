@@ -49,7 +49,7 @@ print("mimi loaded")
 def mimi_streaming_test(mimi, max_duration_sec=10.0):
     pcm_chunk_size = int(mimi.sample_rate / mimi.frame_rate)
     # wget https://github.com/metavoiceio/metavoice-src/raw/main/assets/bria.mp3
-    sample_pcm, sample_sr = sphn.read("bria.mp3")
+    sample_pcm, sample_sr = sphn.read("./data/ferreol.wav")
     sample_rate = mimi.sample_rate
     print("loaded pcm", sample_pcm.shape, sample_sr)
     sample_pcm = sphn.resample(
