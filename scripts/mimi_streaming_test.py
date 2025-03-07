@@ -45,10 +45,30 @@ if args.mimi_weight is None:
 mimi = loaders.get_mimi(args.mimi_weight, args.device)
 print("mimi loaded")
 
+# Load checkpoint
+checkpoint_path = "/home/jhauret/Downloads/2025-02-04_17-59-01_25_epochs_regressive_mimi/checkpoints/last.ckpt"
+state_dict = torch.load(checkpoint_path, map_location="cpu")["state_dict"]
+
+# Rename keys
+new_state_dict = {}
+for k in list(state_dict.keys()):
+    if "trainable_mimi_model" in k:
+        new_k = k.replace("trainable_mimi_model.", "")
+        new_state_dict[new_k] = state_dict[k]  # Keep renamed keys
+
+# Load weights with strict=True
+print("Loading fine-tuned Mimi weights...")
+missing, unexpected = mimi.load_state_dict(new_state_dict, strict=True)
+
+# Print any mismatches
+if missing:
+    print("Missing keys:", missing)
+if unexpected:
+    print("Unexpected keys:", unexpected)
+
 
 def mimi_streaming_test(mimi, max_duration_sec=10.0):
     pcm_chunk_size = int(mimi.sample_rate / mimi.frame_rate)
-    # wget https://github.com/metavoiceio/metavoice-src/raw/main/assets/bria.mp3
     sample_pcm, sample_sr = sphn.read("./data/ferreol_throat.wav")
     sample_rate = mimi.sample_rate
     print("loaded pcm", sample_pcm.shape, sample_sr)
